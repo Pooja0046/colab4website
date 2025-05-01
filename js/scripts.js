@@ -1,59 +1,35 @@
-/*!
-* Start Bootstrap - Creative v7.0.6 (https://startbootstrap.com/theme/creative)
-* Copyright 2013-2022 Start Bootstrap
-* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-creative/blob/master/LICENSE)
-*/
-//
-// Scripts
-// 
+const screen = document.getElementById('screen');
+const playBtn = document.getElementById('play');
+const nextBtn = document.getElementById('next');
+const prevBtn = document.getElementById('prev');
 
-window.addEventListener('DOMContentLoaded', event => {
+// Dummy frames (could later be videos/images/text)
+const frames = [
+    "Welcome to the Glitchy TV Experience",
+    "Documenting Reality... Please Wait...",
+    "Glitch Detected. Stay Tuned.",
+    "Truth Behind the Simulation...",
+    "End of Transmission."
+];
 
-    // Navbar shrink function
-    var navbarShrink = function () {
-        const navbarCollapsible = document.body.querySelector('#mainNav');
-        if (!navbarCollapsible) {
-            return;
-        }
-        if (window.scrollY === 0) {
-            navbarCollapsible.classList.remove('navbar-shrink')
-        } else {
-            navbarCollapsible.classList.add('navbar-shrink')
-        }
+let currentFrame = 0;
 
-    };
+function showFrame(index) {
+    screen.innerHTML = `<p>${frames[index]}</p>`;
+}
 
-    // Shrink the navbar 
-    navbarShrink();
-
-    // Shrink the navbar when page is scrolled
-    document.addEventListener('scroll', navbarShrink);
-
-    // Activate Bootstrap scrollspy on the main nav element
-    const mainNav = document.body.querySelector('#mainNav');
-    if (mainNav) {
-        new bootstrap.ScrollSpy(document.body, {
-            target: '#mainNav',
-            offset: 74,
-        });
-    };
-
-    // Collapse responsive navbar when toggler is visible
-    const navbarToggler = document.body.querySelector('.navbar-toggler');
-    const responsiveNavItems = [].slice.call(
-        document.querySelectorAll('#navbarResponsive .nav-link')
-    );
-    responsiveNavItems.map(function (responsiveNavItem) {
-        responsiveNavItem.addEventListener('click', () => {
-            if (window.getComputedStyle(navbarToggler).display !== 'none') {
-                navbarToggler.click();
-            }
-        });
-    });
-
-    // Activate SimpleLightbox plugin for portfolio items
-    new SimpleLightbox({
-        elements: '#portfolio a.portfolio-box'
-    });
-
+// Button Handlers
+playBtn.addEventListener('click', () => {
+    showFrame(currentFrame);
 });
+
+nextBtn.addEventListener('click', () => {
+    currentFrame = (currentFrame + 1) % frames.length;
+    showFrame(currentFrame);
+});
+
+prevBtn.addEventListener('click', () => {
+    currentFrame = (currentFrame - 1 + frames.length) % frames.length;
+    showFrame(currentFrame);
+});
+
