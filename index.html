@@ -1,27 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glitchy TV</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glitch Film</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="tv-container">
-        <img src="assets/img/TV.png" alt="Old TV" class="tv-frame">
-        <div id="screen" class="tv-screen">Press Play to Start</div>
-        
-        <div class="controls-vertical">
-          <button id="next">▶</button>
-          <button id="play">Play</button>
-          <button id="prev">◀</button>
-        </div>
-      </div>
-      
+  <div id="tv-screen">
+    <video id="video-player" width="640" height="360"></video>
+    <div id="overlay-message"></div>
+    <div id="signal-message" class="hidden"></div>
+    <button id="play-btn">PLAY</button>
+  </div>
 
-    <script src="js/script.js"></script>
+  <audio id="hum-audio" loop>
+    <source src="hum.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="glitch-audio">
+    <source src="glitch.mp3" type="audio/mpeg">
+  </audio>
+
+
+
+
+
+
+  <script>
+    const playBtn = document.getElementById('play-btn');
+    const videoPlayer = document.getElementById('video-player');
+    const overlayMessage = document.getElementById('overlay-message');
+    const signalMessage = document.getElementById('signal-message');
+    const humAudio = document.getElementById('hum-audio');
+    const glitchAudio = document.getElementById('glitch-audio');
+
+    const videos = ['assets/videos/VFX Edit Ball Kick.mp4', 'assets/videos/VFX Edit Chatham Door.mp4', 'assets/videos/VFX Edit Grosvenor East.mp4', 'assets/videos/VFX Edit SODA Stairwell.mp4'];
+    let currentVideo = 0;
+
+    const videoMessages = {
+      0: [{ time: 8, text: "DID YOU SEE IT?!" }],
+      1: [
+        { time: 11, text: "IT'S NOT SUPPOSED TO BE THERE" },
+        { time: 18, text: "LOOK CLOSER" }
+      ],
+      2: [
+        { time: 2, text: "THERE'S MORE THAN ONE..." },
+        { time: 4, text: "WHY?" },
+        { time: 7, text: "WHO'S WATCHING WHO?" }
+      ],
+      3: [
+        { time: 12, text: "STILL GOING..." },
+        { time: 18, text: "CAN'T ESCAPE" },
+        { time: 24, text: "YOU'RE TRAPPED" }
+      ]
+    };
+
+    let messageTimeouts = [];
+
+    function clearOverlayMessages() {
+      messageTimeouts.forEach(timeout => clearTimeout(timeout));
+      messageTimeouts = [];
+      overlayMessage.innerText = '';
+      overlayMessage.style.display = 'none';
+    }
+
+    function scheduleMessages(index) {
+      clearOverlayMessages();
+      const messages = videoMessages[index] || [];
+      messages.forEach(({ time, text }) => {
+        const timeout = setTimeout(() => {
+          overlayMessage.innerText = text;
+          overlayMessage.style.display = 'block';
+          overlayMessage.classList.add('show');
+          setTimeout(() => overlayMessage.classList.remove('show'), 2000);
+        }, time * 1000);
+        messageTimeouts.push(timeout);
+      });
+    }
+
+    function playVideo(index) {
+      if (index >= videos.length) {
+        signalMessage.innerText = 'THEY WERE ALL WATCHING';
+        signalMessage.classList.remove('hidden');
+        setTimeout(() => {
+          signalMessage.classList.add('shutdown');
+        }, 3000);
+        return;
+      }
+
+      videoPlayer.src = videos[index];
+      videoPlayer.play();
+      scheduleMessages(index);
+
+      videoPlayer.onended = () => {
+        signalMessage.innerText = 'LOST SIGNAL';
+        signalMessage.classList.remove('hidden');
+        glitchAudio.volume = Math.min(1, 0.2 + index * 0.2);
+        glitchAudio.play();
+        setTimeout(() => {
+          signalMessage.classList.add('hidden');
+          currentVideo++;
+          playVideo(currentVideo);
+        }, 3000);
+      };
+    }
+
+    playBtn.addEventListener('click', () => {
+      playBtn.innerText = 'PAUSE';
+      humAudio.play();
+      playVideo(currentVideo);
+      playBtn.disabled = true;
+    });
+  </script>
 </body>
 </html>
+
 
 
 
